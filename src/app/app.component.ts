@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, ElementRef, OnDestroy, ViewChild, afterNextRender, afterRender } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import Chart from 'chart.js/auto';
 import { take, timer } from 'rxjs';
@@ -6,9 +7,25 @@ import { take, timer } from 'rxjs';
 @Component({
   selector: 'app-root',
   standalone: true,
+  imports: [FormsModule],
   template: `
     <h1>Hello from Lifecycle Hook!</h1>
     <div>
+      <div>
+        <label>
+          Bar Color:
+          <select [(ngModel)]="barColor">
+              <option value="red">Red</option>
+              <option value="pink">Pink</option>
+              <option value="magenta">Magenta</option>
+              <option value="rebeccapurple">Rebecca Purple</option>
+              <option value="cyan">Cyan</option>
+              <option value="blue">Blue</option>
+              <option value="green">Green</option>
+              <option value="yellow">Yellow</option>
+          </select>
+        </label>
+      </div>
       <canvas #canvas></canvas>
     </div>
   `,
