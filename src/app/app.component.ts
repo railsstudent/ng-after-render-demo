@@ -9,8 +9,8 @@ import { take, timer } from 'rxjs';
   standalone: true,
   imports: [FormsModule],
   template: `
-    <h1>Hello from Lifecycle Hook!</h1>
-    <div>
+    <div class="container">
+      <h1>Hello from Lifecycle Hook!</h1>
       <div>
         <label>
           Bar Color:
@@ -34,8 +34,9 @@ import { take, timer } from 'rxjs';
       display: block;
     }
 
-    div {
-      width: 400px;
+    div.container {
+      width: 800px;
+      padding: 1rem;
     }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -56,6 +57,7 @@ export class AppComponent implements OnDestroy {
 
   chart: Chart | null = null;
   chartData: { year: number; count: number } | null = null;
+  barColor = 'red';
 
   constructor(titleService: Title) {
     titleService.setTitle('ng after render demo');
@@ -82,7 +84,8 @@ export class AppComponent implements OnDestroy {
             datasets: [
               {
                 label: 'Acquisitions by year',
-                data: this.data.map(row => row.count)
+                data: this.data.map(row => row.count),
+                backgroundColor: this.barColor,
               }
             ]
           }
@@ -92,17 +95,21 @@ export class AppComponent implements OnDestroy {
     });
 
     afterRender(() => {
-      console.log('afterRender called');
+      if (this.chart) {
+        const datasets = this.chart.data.datasets;
+        if (this.chartData) {
+          const { year, count } = this.chartData;
+          this.chart.data.labels?.push(year);
+          datasets.forEach((dataset) => {
+            dataset.data.push(count);
+          });
+          this.chartData = null;
+        }
 
-      if (this.chart && this.chartData) {
-        this.chart.data?.labels?.push(this.chartData.year);
-        this.chart.data.datasets.forEach((dataset) => {
-          if (this.chartData) {
-            dataset.data.push(this.chartData.count);
-          }
+        datasets.forEach((dataset) => {
+          dataset.backgroundColor = this.barColor;
         });
         this.chart.update();
-        this.chartData = null;
       }
     })
   }
