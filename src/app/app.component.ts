@@ -1,3 +1,4 @@
+import { NgFor } from '@angular/common';
 import { ChangeDetectionStrategy, Component, ElementRef, OnDestroy, ViewChild, afterNextRender, afterRender } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
@@ -7,7 +8,7 @@ import { take, timer } from 'rxjs';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, NgFor],
   template: `
     <div class="container">
       <h1>Hello from Lifecycle Hook!</h1>
@@ -15,14 +16,9 @@ import { take, timer } from 'rxjs';
         <label>
           Bar Color:
           <select [(ngModel)]="barColor">
-              <option value="red">Red</option>
-              <option value="pink">Pink</option>
-              <option value="magenta">Magenta</option>
-              <option value="rebeccapurple">Rebecca Purple</option>
-              <option value="cyan">Cyan</option>
-              <option value="blue">Blue</option>
-              <option value="green">Green</option>
-              <option value="yellow">Yellow</option>
+            <option *ngFor="let c of barColors; trackBy: trackById" [value]="c.id">
+              {{ c.color }}
+            </option>
           </select>
         </label>
       </div>
@@ -45,6 +41,17 @@ export class AppComponent implements OnDestroy {
   @ViewChild('canvas', { static: true, read: ElementRef })
   canvas!: ElementRef<HTMLCanvasElement>;
 
+  barColors = [
+    { id: 'red', color: 'Red' },
+    { id: 'pink', color: 'Pink' },
+    { id: 'magenta', color: 'Magenta' },
+    { id: 'rebeccapurple', color: 'Rebecca Purple' },
+    { id: 'cyan', color: 'Cyan' },
+    { id: 'blue', color: 'Blue' },
+    { id: 'green', color: 'Green' },
+    { id: 'yellow', color: 'Yellow' }
+  ];
+
   data = [
     { year: 2017, count: 10 },
     { year: 2018, count: 20 },
@@ -62,10 +69,9 @@ export class AppComponent implements OnDestroy {
   constructor(titleService: Title) {
     titleService.setTitle('ng after render demo');
 
-    timer(100, 500)
-      .pipe(
-        take(5)
-      ).subscribe((value) => {
+    timer(100, 1000)
+      .pipe(take(5))
+      .subscribe((value) => {
         this.chartData = {
           year: 2024 + value,
           count: Math.floor(Math.random() * 29 + 1), 
@@ -112,6 +118,10 @@ export class AppComponent implements OnDestroy {
         this.chart.update();
       }
     })
+  }
+
+  trackById(index: number, item: { id: string, color: string }) {
+    return item.id;
   }
 
   ngOnDestroy(): void {
